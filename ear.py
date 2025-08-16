@@ -47,8 +47,8 @@ class TheEar(BaseHasLogs):
                 # Add scores in formatted table
                 scores = list(self._model.prediction_buffer[mdl])
 
-                if scores[-1] >= 0.5:
-                    msg = "Trigger phrase"
+                if scores[-1] >= 0.4:
+                    msg = f"Trigger phrase (Score {scores[-1]})"
                     self._logger.info(msg)
                     detected = True
     
@@ -58,7 +58,7 @@ class TheEar(BaseHasLogs):
         silent_chunks = 0
 
         num_silent_chunks_required = int(silent_sec_cuttof * self._rate / self._chunk_size)
-        self._logger.info("Listening to propmt")
+        self._logger.info("Listening to prompt")
 
         while is_speaking:
             # Get recorded frames and current volume

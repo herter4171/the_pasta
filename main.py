@@ -1,3 +1,5 @@
+import threading
+
 from chatgpt import ChatGPT
 from ear import TheEar
 from the_voice import TheVoice
@@ -12,10 +14,20 @@ while True:
 
     if msg:
         reply = gpt.send_prompt(msg)
-        to_say = ''
+        to_say, to_print = [reply, '']
+        thread = None
 
         if pw.print_tag in reply:
             to_say, to_print = reply.split(pw.print_tag)
+        
+        if to_print:
+            thread = threading.Thread(
+                target=pw.print,
+                args=(to_print,)
+            )
+            thread.start()
 
         TheVoice().speak(to_say)
-        pw.print(to_print)
+        
+        if thread:
+            thread.join()

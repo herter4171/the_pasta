@@ -1,7 +1,6 @@
 from pathlib import Path
 import subprocess
 from base_has_logs import BaseHasLogs
-import threading
 import tempfile
 
 

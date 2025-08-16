@@ -37,7 +37,7 @@ class ChatGPT(BaseHasLogs):
                 full_reply += real_content
         
         self._logger.info(f"Response: {full_reply}")
-        self._mem.add_message("agent", full_reply)
+        self._mem.add_message("assistant", full_reply)
 
         return full_reply
 
