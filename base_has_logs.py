@@ -18,7 +18,7 @@ class BaseHasLogs(object):
 
             # Create a formatter with color codes
             formatter = colorlog.ColoredFormatter(
-                '%(log_color)s%(asctime)s: %(levelname)-8s%(reset)s %(white)s%(message)s',
+                '%(cyan)s%(asctime)s: %(log_color)s%(levelname)-8s%(reset)s %(white)s%(message)s',
                 datefmt='%Y-%m-%d %H:%M:%S',
                 log_colors={
                     'DEBUG':    'cyan',

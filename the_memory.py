@@ -20,7 +20,8 @@ class TheMemory(object):
         msg = json.dumps({"role": role, "content": content})
         self._redis.rpush(self._session_id, msg)
 
-    def get_messages(self, max_messages=100):
+    # TODO: USE TOKEN CUTOFF
+    def get_messages(self, max_messages=10000):
         if self.num_messages <= max_messages:
             desired_messages = self._redis.lrange(self._session_id, 0, -1)
         else:
@@ -29,7 +30,7 @@ class TheMemory(object):
             desired_messages = sys_prompt + tail_messages
 
         message_dicts = []
-        
+
         for curr_bytes in desired_messages:
             msg = json.loads(curr_bytes.decode('utf-8'))
             message_dicts.append(msg)

@@ -1,10 +1,14 @@
 from openai import OpenAI
 from pydub import AudioSegment
 from pydub.playback import play
+import simpleaudio as sa
 import io
 
-class TheVoice(object):
-    def __init__(self):    
+from base_has_logs import BaseHasLogs
+
+class TheVoice(BaseHasLogs):
+    def __init__(self):
+        super().__init__()  
         self._client = OpenAI(base_url="http://192.168.68.75:8880/v1", api_key="not-needed")
 
     def speak(self, text):
@@ -23,6 +27,11 @@ class TheVoice(object):
         
         # Play the loaded audio segment.
         play(audio_segment)
+    
+    def play_blip(self, file_path="blip.wav"):
+        self._logger.info(f"Playing {file_path}")
+        sound = AudioSegment.from_wav(file_path)
+        play(sound)
 
 if __name__ == "__main__":
      v = TheVoice()

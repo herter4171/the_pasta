@@ -8,6 +8,7 @@ import sys
 import speech_recognition as sr
 
 from base_has_logs import BaseHasLogs
+from the_voice import TheVoice
 
 class TheEar(BaseHasLogs):
     def __init__(self, wakeword_model_path: str):
@@ -28,8 +29,9 @@ class TheEar(BaseHasLogs):
 
         self._model = Model(wakeword_models=["hey_percy.tflite"])
     
-    def listen(self):
+    def listen(self, voice: TheVoice):
         self._await_invoke()
+        voice.play_blip()
         recorded_frames = self._capture_audio()
         msg = self._transcribe_audio(recorded_frames)
 
@@ -48,7 +50,7 @@ class TheEar(BaseHasLogs):
                 scores = list(self._model.prediction_buffer[mdl])
 
                 if scores[-1] >= 0.4:
-                    msg = f"Trigger phrase (Score {scores[-1]})"
+                    msg = f"Trigger phrase (Score {scores[-1]:.2f})"
                     self._logger.info(msg)
                     detected = True
     

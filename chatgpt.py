@@ -1,5 +1,8 @@
 from openai import OpenAI
 import time
+import tiktoken
+import threading
+from datetime import datetime
 
 from base_has_logs import BaseHasLogs
 from the_memory import TheMemory
@@ -19,9 +22,18 @@ class ChatGPT(BaseHasLogs):
             self.send_prompt(sys_prompt, input_role="system")
 
     def send_prompt(self, prompt: str, input_role="user"):
-        self._mem.add_message(input_role, prompt)
+        # Record to Redis
+        full_prompt = f"{self._get_time_stamp()} {prompt}" if input_role == "user" else prompt
+        self._mem.add_message(input_role, full_prompt)
+
+        # Get all messages
         messages = self._mem.get_messages()
 
+        # Start thread for log token count
+        thread = threading.Thread(target=self._log_token_count, args=(messages,))
+        thread.start()
+
+        # Send prompt
         stream = self._client.chat.completions.create(
             model="gpt-oss:20b",
             messages=messages,
@@ -30,6 +42,7 @@ class ChatGPT(BaseHasLogs):
 
         full_reply = ""
 
+        # Parse reply stream
         for chunk in stream:
             real_content = chunk.choices[0].delta.content
 
@@ -38,9 +51,28 @@ class ChatGPT(BaseHasLogs):
         
         self._logger.info(f"Response: {full_reply}")
         self._mem.add_message("assistant", full_reply)
+        thread.join()
 
         return full_reply
+    
+    def _log_token_count(self, messages: list) -> str:
+        encoding = tiktoken.get_encoding("cl100k_base")
+        num_tokens = 0
+        
+        for curr_msg in messages:
+            num_tokens += 3
 
+            for v in curr_msg.values():
+                num_tokens += len(encoding.encode(v))
+        
+        self._logger.info(f"Token usage: {num_tokens:.2e}")
+
+    def _get_time_stamp(self):
+        now = datetime.now()
+        timestamp = now.strftime("%A, %B %d, %Y, %I:%M:%S %p")
+
+        return f"[{timestamp}]"
+    
 if __name__ == "__main__":
     gpt = ChatGPT("sk-16d7cf8ffea74d25bf1ced61c80563d3")
     gpt.send_prompt("5+2")
