@@ -4,6 +4,7 @@ import time
 from base_has_logs import BaseHasLogs
 from the_memory import TheMemory
 
+
 class ChatGPT(BaseHasLogs):
 
     def __init__(self, api_key: str):
@@ -12,11 +13,9 @@ class ChatGPT(BaseHasLogs):
         self._mem = TheMemory()
 
         if self._mem.is_first_message:
-            sys_prompt = "" \
-            "You are an assistant named Percy.  " \
-            "Your main job is to remember things.  " \
-            "Your output is fed to text to speech, so plain text only." \
-            "Focus your reply on the most recent user message, with the history as context."
+            f = open('prompt.txt')
+            sys_prompt = '\n'.join(f.readlines())
+            f.close()
             self.send_prompt(sys_prompt, input_role="system")
 
     def send_prompt(self, prompt: str, input_role="user"):
