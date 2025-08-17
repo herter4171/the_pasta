@@ -1,0 +1,14 @@
+colorama
+colorlog
+gpiod
+gpiozero==2.0.1
+lgpio
+openai==1.99.9
+numpy==1.26.4
+openwakeword==0.6.0
+pyaudio
+pydub
+redis
+simpleaudio
+SpeechRecognition==3.14.3
+tiktoken

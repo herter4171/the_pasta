@@ -1,11 +1,15 @@
 import threading
 from colorama import Fore, Style
 from gpiozero import LED
+import openwakeword
 
 from chatgpt import ChatGPT
 from ear import TheEar
 from the_voice import TheVoice
 from print_wrapper import PrintWrapper
+
+# One-time download of all pre-trained models (or only select models)
+openwakeword.utils.download_models()
 
 gpt = ChatGPT("sk-16d7cf8ffea74d25bf1ced61c80563d3")
 pw = PrintWrapper()
