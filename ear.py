@@ -54,7 +54,7 @@ class TheEar(BaseHasLogs):
                     self._logger.info(msg)
                     detected = True
     
-    def _capture_audio(self, silent_threshold=1000, silent_sec_cuttof=2) -> list:
+    def _capture_audio(self, silent_threshold=1000, silent_sec_cuttof=1.5) -> list:
         recorded_frames = []
         is_speaking = True
         silent_chunks = 0

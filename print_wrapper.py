@@ -28,6 +28,7 @@ class PrintWrapper(BaseHasLogs):
         """Dump message to printer with options for trail lines and cutting."""
         # Clean up lines to fixed width format, and write
         trunc_msg = self._truncate_lines(msg)
+        trunc_msg = self._clean_gpt_bs_from_lines(trunc_msg)
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(trunc_msg.encode("utf-8"))
         
@@ -46,6 +47,13 @@ class PrintWrapper(BaseHasLogs):
         cmd = f"cat {temp_file.name} | sudo tee {self._printer_path}"
         subprocess.run(cmd, shell=True)
 
+    def _clean_gpt_bs_from_lines(self, msg: str) -> str:
+        return msg.replace('’', "'") \
+                  .replace('“', '"') \
+                  .replace('”', '"') \
+                  .replace('‑', '-') \
+                  .replace('—', '-') \
+                  .replace('…', '...')
 
     def _truncate_lines(self, msg: str)-> str:
         """Converts raw message to fixed width except where newlines are imposed."""

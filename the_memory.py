@@ -16,6 +16,10 @@ class TheMemory(object):
         self._redis = redis.Redis(host=redis_host)
         self._session_id = session_id
     
+    def _update_system_prompt(self, content: str):
+        msg = json.dumps({"role": "system", "content": content})
+        self._redis.lset(self._session_id, 0, msg)
+    
     def add_message(self, role:str, content: str):
         msg = json.dumps({"role": role, "content": content})
         self._redis.rpush(self._session_id, msg)

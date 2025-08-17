@@ -15,11 +15,15 @@ class ChatGPT(BaseHasLogs):
         self._client = OpenAI(api_key=api_key, base_url="https://dsui.twr.church/api/v1")
         self._mem = TheMemory()
 
+        f = open('prompt.txt')
+        sys_prompt = '\n'.join(f.readlines())
+        f.close()
+
+        # Either issue system prompt to get it in there or ensure it's current
         if self._mem.is_first_message:
-            f = open('prompt.txt')
-            sys_prompt = '\n'.join(f.readlines())
-            f.close()
             self.send_prompt(sys_prompt, input_role="system")
+        else:
+            self._mem._update_system_prompt(sys_prompt)
 
     def send_prompt(self, prompt: str, input_role="user"):
         # Record to Redis
@@ -34,8 +38,9 @@ class ChatGPT(BaseHasLogs):
         thread.start()
 
         # Send prompt
+        self._logger.info("Prompt is issued")
         stream = self._client.chat.completions.create(
-            model="gpt-oss:20b",
+            model="mistral-small3.1:24b",
             messages=messages,
             stream=True
         )
