@@ -63,6 +63,8 @@ while True:
         
         if thread:
             thread.join()
+    else:
+        voice.speak("Speak up, please.")
     
     led_stop.set()
     led_thread.join()
