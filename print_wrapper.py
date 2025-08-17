@@ -6,6 +6,10 @@ import tempfile
 
 class PrintWrapper(BaseHasLogs):
     @property
+    def print_remote(self):
+        return not self._printer_path.exists()
+
+    @property
     def print_tag(self):
         return "<print>"
 
@@ -13,7 +17,7 @@ class PrintWrapper(BaseHasLogs):
     def line_char_count(self):
         return 48
 
-    def __init__(self, printer_path = '/dev/usb/lp0'):
+    def __init__(self, printer_path = Path('/dev/usb/lp0')):
         super().__init__()
         self._printer_path = printer_path
         self._thread = None
@@ -43,8 +47,12 @@ class PrintWrapper(BaseHasLogs):
         temp_file.close()
         cut_sfx = "" if cut else "didn't "
         self._logger.info(f"Printed with {num_trail_lines} trailing lines and {cut_sfx}cut the feed")
-
-        cmd = f"cat {temp_file.name} | sudo tee {self._printer_path}"
+        
+        if self.print_remote:
+            cmd = f"ssh aipi \"sudo cat > '{self._printer_path}'\" < \"{temp_file.name}\""
+        else:
+            cmd = f"cat {temp_file.name} | sudo tee {self._printer_path}"
+        
         subprocess.run(cmd, shell=True)
 
     def _clean_gpt_bs_from_lines(self, msg: str) -> str:

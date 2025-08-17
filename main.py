@@ -2,6 +2,7 @@ import threading
 from colorama import Fore, Style
 from gpiozero import LED
 import openwakeword
+import random
 
 from chatgpt import ChatGPT
 from ear import TheEar
@@ -68,7 +69,20 @@ while True:
         if thread:
             thread.join()
     else:
-        voice.speak("Speak up, please.")
+        reply_options = [
+            "What did you just say to me?",
+            "I am NOT your butler.",
+            "Don't take that tone with me.",
+            "Do you talk to your mother with that mouth?",
+            "Hey, I'm sorry, I didn't catch that.",
+            "Speak up, please.",
+            "I'm sorry, you mumbled.",
+            "Get your shit together."
+        ]
+
+        reply_ind = random.randint(0, len(reply_options) - 1)
+        reply = reply_options[reply_ind]
+        voice.speak(reply)
     
     led_stop.set()
     led_thread.join()
