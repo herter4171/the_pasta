@@ -13,6 +13,10 @@ from base_has_logs import BaseHasLogs
 
 class TheHead(BaseHasLogs):
     @staticmethod
+    def get_sound_effect_path():
+        return "blip.wav"
+    
+    @staticmethod
     def blink_led(stop_event, sleep_sec=0.1):
         led = LED(23) # Pin 17
 
@@ -21,10 +25,6 @@ class TheHead(BaseHasLogs):
             stop_event.wait(sleep_sec)
             led.off()
             stop_event.wait(sleep_sec)
-
-    @property
-    def wake_word_model(self):
-        return basename(self._wake_word_path.replace(".tflite", ""))
     
     @property
     def _reply_options(self):
@@ -42,6 +42,14 @@ class TheHead(BaseHasLogs):
     @property
     def _voice_name(self):
         return 'am_adam'
+    
+    @property
+    def llm_model(self):
+        return "mistral-small3.1:24b"
+
+    @property
+    def sys_prompt_path(self):
+        return "prompt.txt"
 
     def __init__(self, model_name):
         # Show processing
@@ -54,7 +62,7 @@ class TheHead(BaseHasLogs):
 
         if msg:
             # Start out assuming no printing
-            reply = gpt.send_prompt(msg)
+            reply = gpt.send_prompt(msg, self.llm_model)
             to_say, to_print = [reply, '']
             print_thread = None
 

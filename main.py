@@ -9,6 +9,7 @@ from chatgpt import ChatGPT
 from ear import TheEar
 from the_voice import TheVoice
 from the_head import TheHead
+from gretchen import Gretchen
 from print_wrapper import PrintWrapper
 
 def print_branding():
@@ -24,13 +25,16 @@ openwakeword.utils.download_models()
 open_web_ui_api_key = "sk-16d7cf8ffea74d25bf1ced61c80563d3"
 
 mdl_head_map = {
-    "hey_percy": TheHead
+    "hey_percy": TheHead,
+    "hey_gretchen": Gretchen
 }
+
+mdl_beep_map = {k: HeadType.get_sound_effect_path() for k,HeadType in mdl_head_map.items()}
 
 printed_branding = False
 
 while True:
-    ear = TheEar(glob("*.tflite"))
+    ear = TheEar(glob("*.tflite"), mdl_beep_map)
 
     if not printed_branding:
         print_branding()
@@ -38,5 +42,5 @@ while True:
 
     mdl, msg = ear.listen()
     head = mdl_head_map[mdl](mdl)
-    gpt = ChatGPT(mdl, open_web_ui_api_key)
+    gpt = ChatGPT(mdl, open_web_ui_api_key, head.sys_prompt_path)
     head.chat(msg, gpt)

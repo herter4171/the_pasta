@@ -8,14 +8,16 @@ from pydub.playback import play
 import logging
 import sys
 import speech_recognition as sr
+from colorama import Fore, Style
 
 from base_has_logs import BaseHasLogs
 from the_voice import TheVoice
 
 class TheEar(BaseHasLogs):
-    def __init__(self, wakeword_model_paths: list):
+    def __init__(self, wakeword_model_paths: list, mdl_beep_map: dict):
         super().__init__()
         self._wakeword_model_paths = wakeword_model_paths
+        self._mdl_beep_map = mdl_beep_map
 
         self._audio = pyaudio.PyAudio()
         self._chunk_size = 1280
@@ -39,7 +41,8 @@ class TheEar(BaseHasLogs):
 
     def listen(self):
         mdl = self._await_invoke()
-        self._play_blip()
+        file_path = self._mdl_beep_map[mdl]
+        self._play_blip(file_path)
         recorded_frames = self._capture_audio()
         msg = self._transcribe_audio(mdl, recorded_frames)
 
@@ -103,7 +106,8 @@ class TheEar(BaseHasLogs):
         try:
             # Recognize speech using Google Web Speech API
             text = recognizer.recognize_google(audio_data)
-            self._logger.info(f"Prompt [{mdl}]: {text}")            
+            mdl_pretty = Fore.MAGENTA + f"Prompt [{mdl}]:" + Style.RESET_ALL
+            self._logger.info(f"{mdl_pretty} {text}")            
         except sr.UnknownValueError:
             self._logger.error("Google Web Speech API could not understand the audio.")
         except Exception as e:
