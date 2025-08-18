@@ -27,11 +27,6 @@ class TheVoice(BaseHasLogs):
         
         # Play the loaded audio segment.
         play(audio_segment)
-    
-    def play_blip(self, file_path="blip.wav"):
-        self._logger.info(f"Playing {file_path}")
-        sound = AudioSegment.from_wav(file_path)
-        play(sound)
 
 if __name__ == "__main__":
      v = TheVoice()

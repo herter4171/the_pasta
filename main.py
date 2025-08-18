@@ -35,14 +35,14 @@ def blink_led(stop_event, sleep_sec=0.1):
 printed_branding = False
 
 while True:
-    ear = TheEar("hey_percy.tflite")
+    ear = TheEar(["hey_percy.tflite"])
 
     if not printed_branding:
         print_branding()
         printed_branding = True
 
+    msg = ear.listen()
     voice = TheVoice()
-    msg = ear.listen(voice)
 
     # Show we're processing
     led_stop = threading.Event()

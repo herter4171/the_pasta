@@ -3,6 +3,8 @@ import numpy as np
 from openwakeword.model import Model
 from time import sleep
 import audioop
+from pydub import AudioSegment
+from pydub.playback import play
 import logging
 import sys
 import speech_recognition as sr
@@ -11,8 +13,9 @@ from base_has_logs import BaseHasLogs
 from the_voice import TheVoice
 
 class TheEar(BaseHasLogs):
-    def __init__(self, wakeword_model_path: str):
+    def __init__(self, wakeword_model_paths: list):
         super().__init__()
+        self._wakeword_model_paths = wakeword_model_paths
 
         self._audio = pyaudio.PyAudio()
         self._chunk_size = 1280
@@ -27,11 +30,16 @@ class TheEar(BaseHasLogs):
             frames_per_buffer=self._chunk_size
         )
 
-        self._model = Model(wakeword_models=["hey_percy.tflite"])
-    
-    def listen(self, voice: TheVoice):
+        self._model = Model(wakeword_models=self._wakeword_model_paths)
+
+    def _play_blip(self, file_path="blip.wav"):
+        self._logger.info(f"Playing {file_path}")
+        sound = AudioSegment.from_wav(file_path)
+        play(sound)
+
+    def listen(self):
         self._await_invoke()
-        voice.play_blip()
+        self._play_blip()
         recorded_frames = self._capture_audio()
         msg = self._transcribe_audio(recorded_frames)
 
@@ -40,6 +48,7 @@ class TheEar(BaseHasLogs):
     def _await_invoke(self):
         self._logger.info("Waiting for trigger phrase")
         detected = False
+        detected_model = None
 
         while not detected:
             self._audio = np.frombuffer(self._mic_stream.read(self._chunk_size), dtype=np.int16)
@@ -52,7 +61,11 @@ class TheEar(BaseHasLogs):
                 if scores[-1] >= 0.4:
                     msg = f"Trigger phrase (Score {scores[-1]:.2f})"
                     self._logger.info(msg)
+                    detected_model = mdl
                     detected = True
+                    break
+        
+        return detected_model
     
     def _capture_audio(self, silent_threshold=1000, silent_sec_cuttof=1.5) -> list:
         recorded_frames = []
