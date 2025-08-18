@@ -38,12 +38,12 @@ class TheEar(BaseHasLogs):
         play(sound)
 
     def listen(self):
-        self._await_invoke()
+        mdl = self._await_invoke()
         self._play_blip()
         recorded_frames = self._capture_audio()
-        msg = self._transcribe_audio(recorded_frames)
+        msg = self._transcribe_audio(mdl, recorded_frames)
 
-        return msg
+        return mdl, msg
 
     def _await_invoke(self):
         self._logger.info("Waiting for trigger phrase")
@@ -59,7 +59,7 @@ class TheEar(BaseHasLogs):
                 scores = list(self._model.prediction_buffer[mdl])
 
                 if scores[-1] >= 0.4:
-                    msg = f"Trigger phrase (Score {scores[-1]:.2f})"
+                    msg = f"Trigger phrase (Model {mdl}, Score {scores[-1]:.2f})"
                     self._logger.info(msg)
                     detected_model = mdl
                     detected = True
@@ -92,7 +92,7 @@ class TheEar(BaseHasLogs):
         
         return recorded_frames
 
-    def _transcribe_audio(self, recorded_frames: list) -> str:
+    def _transcribe_audio(self, mdl: str, recorded_frames: list) -> str:
         # Create an AudioData object
         raw_audio_data = b''.join(recorded_frames)
         recognizer = sr.Recognizer()
@@ -103,7 +103,7 @@ class TheEar(BaseHasLogs):
         try:
             # Recognize speech using Google Web Speech API
             text = recognizer.recognize_google(audio_data)
-            self._logger.info(f"Prompt: {text}")            
+            self._logger.info(f"Prompt [{mdl}]: {text}")            
         except sr.UnknownValueError:
             self._logger.error("Google Web Speech API could not understand the audio.")
         except Exception as e:

@@ -10,20 +10,18 @@ from the_memory import TheMemory
 
 class ChatGPT(BaseHasLogs):
 
-    def __init__(self, api_key: str):
+    def __init__(self, mdl: str, api_key: str):
         super().__init__()
+        self._mdl = mdl
         self._client = OpenAI(api_key=api_key, base_url="https://dsui.twr.church/api/v1")
-        self._mem = TheMemory()
+        self._mem = TheMemory(session_id=self._mdl)
 
         f = open('prompt.txt')
         sys_prompt = '\n'.join(f.readlines())
         f.close()
 
-        # Either issue system prompt to get it in there or ensure it's current
-        if self._mem.is_first_message:
-            self.send_prompt(sys_prompt, input_role="system")
-        else:
-            self._mem._update_system_prompt(sys_prompt)
+        self._mem._update_system_prompt(sys_prompt)
+            
 
     def send_prompt(self, prompt: str, input_role="user"):
         # Record to Redis
@@ -54,7 +52,7 @@ class ChatGPT(BaseHasLogs):
             if real_content is not None:
                 full_reply += real_content
         
-        self._logger.info(f"Response: {full_reply}")
+        self._logger.info(f"Response {self._mdl}: {full_reply}")
         self._mem.add_message("assistant", full_reply)
         thread.join()
 

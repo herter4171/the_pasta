@@ -7,14 +7,15 @@ import io
 from base_has_logs import BaseHasLogs
 
 class TheVoice(BaseHasLogs):
-    def __init__(self):
+    def __init__(self, voice_name):
         super().__init__()  
         self._client = OpenAI(base_url="http://192.168.68.75:8880/v1", api_key="not-needed")
+        self._voice_name = voice_name
 
     def speak(self, text):
         with self._client.audio.speech.with_streaming_response.create(
             model="kokoro",
-            voice="am_adam", #single or multiple voicepack combo
+            voice=self._voice_name,
             input=text
         ) as response:
             audio_bytes = response.read()
