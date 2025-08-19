@@ -38,4 +38,4 @@ class Gretchen(TheHead):
 
     @property
     def sys_prompt_path(self):
-        return "prompt_gretchen.txt"
+        return f"{Gretchen._prompts_dir}/prompt_gretchen.txt"

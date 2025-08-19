@@ -12,6 +12,8 @@ from print_wrapper import PrintWrapper
 from base_has_logs import BaseHasLogs
 
 class TheHead(BaseHasLogs):
+    _prompts_dir = "prompts"
+
     @staticmethod
     def get_sound_effect_path():
         return "blip.wav"
@@ -49,7 +51,7 @@ class TheHead(BaseHasLogs):
 
     @property
     def sys_prompt_path(self):
-        return "prompt.txt"
+        return f"{TheHead._prompts_dir}/prompt.txt"
 
     def __init__(self, model_name):
         # Show processing

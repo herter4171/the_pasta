@@ -35,4 +35,4 @@ class Winslow(TheHead):
 
     @property
     def sys_prompt_path(self):
-        return "prompt_winslow.txt"
+        return f"{Winslow._prompts_dir}/prompt_winslow.txt"
