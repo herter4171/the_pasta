@@ -10,6 +10,7 @@ from ear import TheEar
 from the_voice import TheVoice
 from the_head import TheHead
 from gretchen import Gretchen
+from winslow import Winslow
 from print_wrapper import PrintWrapper
 
 def print_branding():
@@ -26,7 +27,8 @@ open_web_ui_api_key = "sk-16d7cf8ffea74d25bf1ced61c80563d3"
 
 mdl_head_map = {
     "hey_percy": TheHead,
-    "hey_gretchen": Gretchen
+    "hey_gretchen": Gretchen,
+    "hey_winslow": Winslow
 }
 
 mdl_beep_map = {k: HeadType.get_sound_effect_path() for k,HeadType in mdl_head_map.items()}

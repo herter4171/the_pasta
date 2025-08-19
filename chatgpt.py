@@ -53,7 +53,7 @@ class ChatGPT(BaseHasLogs):
             if real_content is not None:
                 full_reply += real_content
         
-        mdl_pretty = Fore.MAGENTA + "Response [{self._mdl}]:" + Style.RESET_ALL
+        mdl_pretty = Fore.MAGENTA + f"Response [{self._mdl}]:" + Style.RESET_ALL
         self._logger.info(f"{mdl_pretty} {full_reply}")
         self._mem.add_message("assistant", full_reply)
         thread.join()
