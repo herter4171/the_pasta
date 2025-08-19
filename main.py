@@ -36,7 +36,7 @@ mdl_beep_map = {k: HeadType.get_sound_effect_path() for k,HeadType in mdl_head_m
 printed_branding = False
 
 while True:
-    ear = TheEar(glob("*.tflite"), mdl_beep_map)
+    ear = TheEar(glob("wake_word_models/*.tflite"), mdl_beep_map)
 
     if not printed_branding:
         print_branding()
