@@ -31,7 +31,7 @@ mdl_head_map = {
     "hey_winslow": Winslow
 }
 
-mdl_beep_map = {k: HeadType.get_sound_effect_path() for k,HeadType in mdl_head_map.items()}
+mdl_beep_map = {k: f"listen_beeps/{HeadType.get_sound_effect_path()}" for k,HeadType in mdl_head_map.items()}
 
 printed_branding = False
 
