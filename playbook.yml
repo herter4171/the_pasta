@@ -1,0 +1,55 @@
+  - hosts: all
+    become: no
+    vars:
+      nr_user: pi
+    tasks:
+      #-----------------------------------------------------------------------#
+      # INIT
+      #-----------------------------------------------------------------------#
+      - name: Set common vars
+        set_fact:
+          clone_path: "/home/{{ nr_user }}/the_pasta"
+          svc_name: percy.service
+
+      - name: Set derived vars
+        set_fact:
+          main_py: "{{ clone_path }}/main.py"
+          svc_path: "/etc/systemd/system/{{ svc_name }}"
+      
+      - name: Ensure latest in {{ clone_path }}
+        ansible.builtin.git:
+          repo: git@lilnas.church:herter/the_pasta.git
+          dest: "{{ clone_path }}"
+          version: master
+      
+      - name: Create systemd unit {{ svc_name }}
+        become: yes
+        copy:
+          dest: "{{ svc_path }}"
+          content: |
+            [Unit]
+            Description=PERCY
+            After=network.target
+
+            [Service]
+            User={{ nr_user }}
+            Group={{ nr_user }}
+            WorkingDirectory={{ clone_path }}
+            ExecStart={{ clone_path }}/venv/bin/python3 main.py
+            Restart=on-failure
+            RestartSec=5s
+            StandardOutput=journal
+            StandardError=journal
+            SyslogIdentifier=PERCY
+            Environment="XDG_RUNTIME_DIR=/run/user/1000"
+
+            [Install]
+            WantedBy=multi-user.target
+
+      - name: Set up systemd for {{ svc_name }}
+        become: yes
+        systemd_service:
+          state: started
+          name: "{{ svc_name }}"
+          enabled: true
+          daemon_reload: true
